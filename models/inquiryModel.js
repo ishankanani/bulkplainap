@@ -16,13 +16,10 @@ const inquirySchema = new mongoose.Schema(
       enum: ["new", "prospect", "followup", "hot", "won", "lost"],
     },
 
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-      default: null,
+    seen: {
+      type: Boolean,
+      default: false,
     },
-
-    seen: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
