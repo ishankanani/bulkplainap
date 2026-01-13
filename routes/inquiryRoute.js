@@ -1,22 +1,22 @@
-// backend/routes/inquiryRoute.js
 import express from "express";
 import {
   createInquiry,
   getInquiryList,
   updateInquiryStatus,
   getInquiryStats,
-  markSeen,
+  getTodayFollowUps,
+  getPendingFollowUps,
 } from "../controllers/inquiryController.js";
 
 const router = express.Router();
 
-// PUBLIC (frontend form)
 router.post("/create", createInquiry);
-
-// ADMIN / DASHBOARD
 router.get("/list", getInquiryList);
 router.get("/stats", getInquiryStats);
-router.post("/seen", markSeen);
 router.put("/update/:id", updateInquiryStatus);
+
+// FOLLOW-UP ROUTES (ADMIN PAGES)
+router.get("/followup/today", getTodayFollowUps);
+router.get("/followup/pending", getPendingFollowUps);
 
 export default router;
