@@ -1,11 +1,22 @@
 // backend/routes/inquiryRoute.js
 import express from "express";
-import { createInquiry, getAllInquiries, markSeen } from "../controllers/inquiryController.js";
+import {
+  createInquiry,
+  getInquiryList,
+  updateInquiryStatus,
+  getInquiryStats,
+  markSeen,
+} from "../controllers/inquiryController.js";
 
 const router = express.Router();
 
-router.post("/create", createInquiry); // POST /api/inquiry/create
-router.get("/all", getAllInquiries);   // GET  /api/inquiry/all
-router.post("/seen", markSeen);        // POST /api/inquiry/seen
+// PUBLIC
+router.post("/create", createInquiry);
+
+// ADMIN / DASHBOARD
+router.get("/list", getInquiryList);
+router.get("/stats", getInquiryStats);
+router.post("/seen", markSeen);
+router.put("/update/:id", updateInquiryStatus);
 
 export default router;
