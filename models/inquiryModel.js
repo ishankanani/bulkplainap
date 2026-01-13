@@ -1,4 +1,3 @@
-// backend/models/inquiryModel.js
 import mongoose from "mongoose";
 
 const inquirySchema = new mongoose.Schema(
@@ -16,6 +15,17 @@ const inquirySchema = new mongoose.Schema(
       enum: ["new", "prospect", "followup", "hot", "won", "lost"],
     },
 
+    followUpDate: {
+      type: Date,
+      default: null,
+    },
+
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      default: null,
+    },
+
     seen: {
       type: Boolean,
       default: false,
@@ -24,7 +34,5 @@ const inquirySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const InquiryModel =
-  mongoose.models.inquiry || mongoose.model("inquiry", inquirySchema);
-
-export default InquiryModel;
+export default mongoose.models.inquiry ||
+  mongoose.model("inquiry", inquirySchema);
