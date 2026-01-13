@@ -10,7 +10,7 @@ import {
 
 const router = express.Router();
 
-// PUBLIC
+// PUBLIC (frontend form)
 router.post("/create", createInquiry);
 
 // ADMIN / DASHBOARD
