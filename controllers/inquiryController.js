@@ -1,36 +1,20 @@
-// backend/controllers/inquiryController.js
-import InquiryModel from "../models/inquiryModel.js";
-
-// Create inquiry
-export const createInquiry = async (req, res) => {
+export const getInquiryList = async (req, res) => {
   try {
-    const inquiry = await InquiryModel.create(req.body);
-    res.json({ success: true, inquiry });
-  } catch (error) {
-    console.error("createInquiry error:", error);
-    res.json({ success: false, message: error.message });
-  }
-};
+    const { status, name, contact, sort } = req.query;
 
-// Get all inquiries (admin)
-export const getAllInquiries = async (req, res) => {
-  try {
-    const inquiries = await InquiryModel.find().sort({ createdAt: -1 });
+    const filter = {};
+    if (status) filter.status = status;
+    if (name) filter.name = new RegExp(name, "i");
+    if (contact) filter.contact = new RegExp(contact, "i");
+
+    let sortOption = { createdAt: -1 };
+    if (sort === "oldest") sortOption = { createdAt: 1 };
+    if (sort === "next") sortOption = { followUpDate: 1 };
+
+    const inquiries = await InquiryModel.find(filter).sort(sortOption);
+
     res.json({ success: true, inquiries });
-  } catch (error) {
-    console.error("getAllInquiries error:", error);
-    res.json({ success: false, message: error.message });
-  }
-};
-
-// Mark as seen
-export const markSeen = async (req, res) => {
-  try {
-    const { id } = req.body;
-    await InquiryModel.findByIdAndUpdate(id, { seen: true });
-    res.json({ success: true, message: "Marked as Seen" });
-  } catch (error) {
-    console.error("markSeen error:", error);
-    res.json({ success: false, message: error.message });
+  } catch (err) {
+    res.json({ success: false, message: err.message });
   }
 };
