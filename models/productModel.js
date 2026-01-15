@@ -2,20 +2,31 @@ import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  code: { type: String }, // new optional code
+  code: { type: String },
+
   description: { type: String, required: true },
   price: { type: Number, required: true },
-  moq: { type: String, default: "" }, // new field
-  image: { type: Array, required: true },
+  moq: { type: String, default: "" },
+
+  image: { type: [String], required: true },
+
   category: { type: String, required: true },
   subCategory: { type: String, required: true },
-  sizes: { type: Array, required: true },
+
+  sizes: { type: [String], default: [] },
+  fabric: { type: [String], default: [] },
+  colors: { type: [String], default: [] },
+
+  warranty: { type: String, default: "" },
   bestseller: { type: Boolean, default: false },
 
-  fabric: { type: [String], default: [] }, // ⭐ MULTIPLE FABRIC
-  colors: { type: [String], default: [] }, // ⭐ MULTIPLE COLORS
+  // 🔥🔥🔥 THIS WAS MISSING
+  apparelAttributes: {
+    type: Object,
+    default: {},
+  },
 
-  date: { type: Number, required: true }
+  date: { type: Number, default: Date.now },
 });
 
 const productModel =
