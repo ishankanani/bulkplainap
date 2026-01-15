@@ -20,6 +20,8 @@ export const addProduct = async (req, res) => {
       colors,
       fabric,
       moq,
+      apparelAttributes, // 🔥 IMPORTANT
+      warranty,
     } = req.body;
 
     const files = req.files?.images || [];
@@ -31,7 +33,7 @@ export const addProduct = async (req, res) => {
       });
     }
 
-    // Upload images
+    /* ---------- Upload images to Cloudinary ---------- */
     const imageUrls = await Promise.all(
       files.map(async (file) => {
         const upload = await cloudinary.uploader.upload(file.path);
@@ -42,18 +44,41 @@ export const addProduct = async (req, res) => {
       })
     );
 
+    /* ---------- SAFE JSON PARSING ---------- */
+    const parsedSizes = sizes ? JSON.parse(sizes) : [];
+    const parsedColors = colors ? JSON.parse(colors) : [];
+    const parsedFabric = fabric ? JSON.parse(fabric) : [];
+
+    let parsedApparel = {};
+    if (apparelAttributes) {
+      try {
+        parsedApparel = JSON.parse(apparelAttributes);
+      } catch {
+        parsedApparel = {};
+      }
+    }
+
+    /* ---------- BUILD PRODUCT ---------- */
     const productData = {
       name,
       productCode: productCode || "",
       description,
       price: Number(price),
       moq: moq || "",
+
       category,
       subCategory,
+
       bestseller: bestseller === "true" || bestseller === true,
-      sizes: sizes ? JSON.parse(sizes) : [],
-      colors: colors ? JSON.parse(colors) : [],
-      fabric: fabric ? JSON.parse(fabric) : [],
+
+      sizes: parsedSizes,
+      colors: parsedColors,
+      fabric: parsedFabric,
+
+      warranty: warranty || "",
+
+      apparelAttributes: parsedApparel, // 🔥 SAVED HERE
+
       image: imageUrls,
       date: Date.now(),
     };
@@ -90,26 +115,40 @@ export const updateProduct = async (req, res) => {
       colors,
       fabric,
       moq,
+      apparelAttributes, // 🔥 IMPORTANT
+      warranty,
     } = req.body;
 
     const product = await productModel.findById(id);
-    if (!product)
+    if (!product) {
       return res.json({ success: false, message: "Product not found" });
+    }
 
+    /* ---------- BASIC FIELDS ---------- */
     product.name = name;
     product.description = description;
-    product.price = price;
+    product.price = Number(price);
     product.category = category;
     product.subCategory = subCategory;
     product.productCode = productCode || "";
     product.moq = moq || "";
-    product.bestseller = bestseller === "true";
+    product.warranty = warranty || "";
+    product.bestseller = bestseller === "true" || bestseller === true;
 
+    /* ---------- JSON FIELDS ---------- */
     product.sizes = sizes ? JSON.parse(sizes) : [];
     product.colors = colors ? JSON.parse(colors) : [];
     product.fabric = fabric ? JSON.parse(fabric) : [];
 
-    // Image update
+    if (apparelAttributes) {
+      try {
+        product.apparelAttributes = JSON.parse(apparelAttributes);
+      } catch {
+        product.apparelAttributes = {};
+      }
+    }
+
+    /* ---------- IMAGE UPDATE ---------- */
     if (req.files?.images?.length > 0) {
       const imageUrls = await Promise.all(
         req.files.images.map(async (file) => {
@@ -120,7 +159,6 @@ export const updateProduct = async (req, res) => {
           return upload.secure_url;
         })
       );
-
       product.image = imageUrls;
     }
 
