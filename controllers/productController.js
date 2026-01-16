@@ -20,7 +20,7 @@ export const addProduct = async (req, res) => {
       colors,
       fabric,
       moq,
-      apparelAttributes, // 🔥 IMPORTANT
+      apparelAttributes,
       warranty,
     } = req.body;
 
@@ -77,7 +77,7 @@ export const addProduct = async (req, res) => {
 
       warranty: warranty || "",
 
-      apparelAttributes: parsedApparel, // 🔥 SAVED HERE
+      apparelAttributes: parsedApparel,
 
       image: imageUrls,
       date: Date.now(),
@@ -115,7 +115,7 @@ export const updateProduct = async (req, res) => {
       colors,
       fabric,
       moq,
-      apparelAttributes, // 🔥 IMPORTANT
+      apparelAttributes,
       warranty,
     } = req.body;
 
@@ -140,11 +140,18 @@ export const updateProduct = async (req, res) => {
     product.colors = colors ? JSON.parse(colors) : [];
     product.fabric = fabric ? JSON.parse(fabric) : [];
 
-    if (apparelAttributes) {
+    /**
+     * 🔐 IMPORTANT SAFETY FIX
+     * - Preserve existing apparelAttributes
+     * - Update ONLY if new data is sent
+     */
+    if (apparelAttributes !== undefined) {
       try {
-        product.apparelAttributes = JSON.parse(apparelAttributes);
+        product.apparelAttributes = apparelAttributes
+          ? JSON.parse(apparelAttributes)
+          : {};
       } catch {
-        product.apparelAttributes = {};
+        // keep existing value if parsing fails
       }
     }
 
